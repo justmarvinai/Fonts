@@ -21,7 +21,7 @@ def nW(p):
 
 
 def oW(p):
-    return p.w(520, 1.25)
+    return p.w(508, 0.9)
 
 
 def arch_ry(p):
@@ -33,10 +33,11 @@ def arch(p, x0, x1, top, cy, V=None, H=None, j=None):
     V = p.V if V is None else V
     H = p.H if H is None else H
     j = p.joint if j is None else j
+    c = p.crotch * (V / p.V)
     ry = top - cy
     outer = ellipse(x0 + j, cy - ry, x1, top, p.ko)
-    inner = ellipse(x0 + V, cy - (ry - H), x1 - V, top - H, p.ki)
-    return I(D(outer, inner), above(cy))
+    inner = ellipse(x0 + V - c, cy - (ry - H), x1 - V, top - H, p.ki)
+    return I(D(outer, inner), above(cy), rightof(x0))
 
 
 def bowl(p, x0, x1, y0, y1, V=None, H=None, j=None):
@@ -44,17 +45,18 @@ def bowl(p, x0, x1, y0, y1, V=None, H=None, j=None):
     V = p.V if V is None else V
     H = p.H if H is None else H
     j = p.joint if j is None else j
-    return D(ellipse(x0 + j, y0, x1, y1, p.ko),
-             ellipse(x0 + V, y0 + H, x1 - V, y1 - H, p.ki))
+    c = p.crotch * (V / p.V)
+    return I(D(ellipse(x0 + j, y0, x1, y1, p.ko),
+               ellipse(x0 + V - c, y0 + H, x1 - V, y1 - H, p.ki)), rightof(x0))
 
 
 def dot_d(p):
-    return 0.86 * p.V + 34
+    return 1.04 * p.V + 6
 
 
 def dot_y(p):
     d = dot_d(p)
-    return p.xh + 58 + 0.36 * p.V + d / 2
+    return p.xh + 64 + 0.2 * p.V + d / 2
 
 
 # ---------------------------------------------------------------------------
@@ -109,8 +111,8 @@ def r(p):
     ob = (p.joint, cy - arch_ry(p), W, xh + os)
     ib = (V, cy - arch_ry(p) + H, W - V, xh + os - H)
     cx, cyy, rx, ry = mid_radii(ob, ib)
-    ln = cutline(cx, cy, rx, arch_ry(p) - H / 2, 52, 0.8)
-    a = D(a, side(ln, far(cx, cy, 1, -0.2)))
+    ln = cutline(cx, cyy, rx, ry, 48, 0.55, flat=False)
+    a = D(a, I(rightof(cx), side(ln, far(cx, cy, 1, -0.2))))
     s = U(rect(0, 0, V, xh), a)
     return G(s, p.sb, p.sbd + 6)
 
@@ -157,7 +159,7 @@ def q(p):
 @glyph("c", 0x63)
 def c(p):
     V, H, xh, os = p.V, p.H, p.xh, p.os
-    W = oW(p) * 0.97
+    W = oW(p) * 0.93
     ob = (0, -os, W, xh + os)
     ib = (V, -os + H, W - V, xh + os - H)
     s = ring(ob, ib, p.ko, p.ki)
@@ -171,13 +173,14 @@ def c(p):
 
 @glyph("e", 0x65)
 def e(p):
-    V, H, xh, os = p.V, p.H, p.xh, p.os
-    W = oW(p)
+    V, xh, os = p.V, p.xh, p.os
+    H = p.H * (1 - 0.0008 * p.dv)
+    W = oW(p) * 0.95
     ob = (0, -os, W, xh + os)
     ib = (V, -os + H, W - V, xh + os - H)
     s = ring(ob, ib, p.ko, p.ki)
     cx, cy, rx, ry = mid_radii(ob, ib)
-    bh = H * 0.94
+    bh = H * (0.9 - 0.0013 * p.dv)
     btop = xh * 0.5 + bh * 0.5 + 6
     bbot = btop - bh
     bt = cutline(cx, cy, rx, ry, -36, TV)
@@ -189,9 +192,9 @@ def e(p):
 
 @glyph("a", 0x61)
 def a(p):
-    """Double-storey a with a geometric hood."""
+    """Double-storey grotesque a."""
     V, H, xh, os = p.V, p.H, p.xh, p.os
-    W = p.w(468, 1.1)
+    W = p.w(478, 0.95)
     top = xh + os
     ry = arch_ry(p) * 0.92
     cy = top - ry
@@ -201,18 +204,23 @@ def a(p):
     cx, _, rx, rry = mid_radii(ob, ib)
     ln = cutline(cx, cy, rx, rry, 148, 0.25)
     hood = D(hood, I(leftof(cx), side(ln, far(cx, cy, -1, -0.6))))
-    # bowl
-    bt = xh * 0.6 + 0.08 * V
-    jb = p.joint * 0.9
-    bowl_ = D(ellipse(0, -os, W - jb, bt, p.ko),
-              ellipse(V * 0.96, -os + H, W - V, bt - H * 0.95, p.ki))
-    s = U(hood, bowl_, rect(W - V, 0, W, cy))
+    # bowl: round on the left, flat top running straight into the stem
+    bt = xh * 0.54 + 0.36 * V
+    y0 = -os
+    R = (bt - y0) / 2.0
+    xs = W - V + 1
+    k = p.ko + 0.02
+    outer = U(rect(R, y0, xs, bt), I(ellipse(0, y0, 2 * R, bt, k), leftof(R + 0.5)))
+    tv, th = V * 0.96, H * 0.9
+    inner = I(ellipse(tv, y0 + H, xs + (xs - tv) * 0.6, bt - th, 0.7), leftof(xs))
+    bowl_ = D(outer, inner)
+    s = U(hood, bowl_, rect(W - V, y0, W, cy))
     return G(s, p.sbo * 0.9, p.sb)
 
 
 @glyph("a.ss01")
 def a_ss01(p):
-    """Single-storey geometric a (stylistic set 1)."""
+    """Single-storey a (stylistic set 1)."""
     V, H, xh, os = p.V, p.H, p.xh, p.os
     W = oW(p) * 0.985 + 0.06 * V
     s = U(rect(0, 0, V, xh), bowl(p, 0, W, -os, xh + os))
@@ -243,7 +251,7 @@ def s_build(p, W, top, V, H, os, ts_ratio=1.1, ym_ratio=0.515, ta=42, tb=222, tv
 @glyph("s", 0x73)
 def s(p):
     W = p.w(408, 1.05)
-    sh = s_build(p, W, p.xh, p.V, p.H * (1 - p.dv / 900), p.os)
+    sh = s_build(p, W, p.xh, p.V, p.H * 0.88, p.os, ts_ratio=1.16)
     return G(sh, p.sbo * 0.9, p.sbo * 0.9)
 
 
@@ -257,13 +265,13 @@ def t(p):
     stem = rect(tx, 0, tx + V, ttop)
     stem = D(stem, halfplane(tx - 1, ttop - 0.62 * V - 30, tx + V, ttop + 1))
     # hook
-    R = p.w(150, 0.9)
+    R = p.w(150, 0.6)
     hy = arch_ry(p) * 0.82
     ob = (tx, -os, tx + 2 * R + V * 0.3, -os + 2 * hy)
     ib = (tx + V, -os + H, tx + 2 * R + V * 0.3 - V, -os + 2 * hy - H)
     hk = I(ring(ob, ib, p.ko, p.ki), below((ob[1] + ob[3]) / 2))
     cx, cy, rx, ry = mid_radii(ob, ib)
-    ln = cutline(cx, cy, rx, ry, -42, 0.85)
+    ln = cutline(cx, cy, rx, ry, -48, 0.45, flat=False)
     hk = D(hk, I(rightof(cx), side(ln, far(cx, cy, 1, 0.3))))
     stem = U(I(stem, above(cy)), hk)
     bar = rect(0, xh - H, W, xh)
@@ -274,16 +282,16 @@ def t(p):
 @glyph("f", 0x66)
 def f(p):
     V, H, xh, os = p.V, p.H, p.xh, p.os
-    fx = p.w(62, 0.25)
-    W = p.w(300, 0.9)
-    R = p.w(152, 0.9)
+    fx = p.w(56, 0.25)
+    W = p.w(268, 0.8)
+    R = p.w(136, 0.7)
     hy = arch_ry(p) * 0.86
     top = p.asc + os
     ob = (fx, top - 2 * hy, fx + 2 * R + V * 0.3, top)
     ib = (fx + V, top - 2 * hy + H, fx + 2 * R + V * 0.3 - V, top - H)
     hk = I(ring(ob, ib, p.ko, p.ki), above((ob[1] + ob[3]) / 2))
     cx, cy, rx, ry = mid_radii(ob, ib)
-    ln = cutline(cx, cy, rx, ry, 40, 0.85)
+    ln = cutline(cx, cy, rx, ry, 44, 0.45, flat=False)
     hk = D(hk, I(rightof(cx), side(ln, far(cx, cy, 1, -0.3))))
     stem = U(rect(fx, 0, fx + V, cy), hk)
     bar = rect(0, xh - H, W, xh)
@@ -313,7 +321,7 @@ def _jhook(p):
     ib = (ob[0] + V, bot + H, x1 - V, bot + 2 * hy - H)
     hk = I(ring(ob, ib, p.ko, p.ki), below((ob[1] + ob[3]) / 2))
     cx, cy, rx, ry = mid_radii(ob, ib)
-    ln = cutline(cx, cy, rx, ry, 208, 0.6)
+    ln = cutline(cx, cy, rx, ry, 222, 0.45, flat=False)
     hk = D(hk, I(leftof(cx), side(ln, far(cx, cy, -1, 0.3))))
     return U(rect(0, cy, V, xh), hk)
 
@@ -321,12 +329,13 @@ def _jhook(p):
 @glyph("j", 0x6A)
 def j(p):
     s = U(_jhook(p), dot(p.V / 2, dot_y(p), dot_d(p)))
-    return G(s, p.sbd, p.sb, top_anchor=p.V / 2)
+    return G(s, p.sb * 0.95 + bounds(s)[0], p.sb, top_anchor=p.V / 2)
 
 
 @glyph("dotlessj", 0x237)
 def dotlessj(p):
-    return G(_jhook(p), p.sbd, p.sb)
+    s = _jhook(p)
+    return G(s, p.sb * 0.95 + bounds(s)[0], p.sb)
 
 
 @glyph("l", 0x6C)
@@ -355,7 +364,7 @@ def k_build(p, W, top, stem_top, V, D_, ya_r=0.12, t=0.47):
 @glyph("k", 0x6B)
 def k(p):
     W = p.w(412, 0.95)
-    s = k_build(p, W, p.xh, p.asc, p.V, p.D * 0.96, ya_r=0.2, t=0.45)
+    s = k_build(p, W, p.xh, p.asc, p.V, p.D * 0.96, ya_r=0.27, t=0.45)
     return G(s, p.sb, p.sbd)
 
 

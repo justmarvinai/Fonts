@@ -2,7 +2,7 @@
 
 import math
 
-from geom import (U, D, I, rect, ellipse, ring, poly, para, hwidth, line,
+from geom import (U, D, I, rect, ellipse, ring, poly, para, hwidth, line, ellipse_pts, tangent_pt,
                   above, below, leftof, rightof, band, rot180, move, bounds,
                   wedge)
 from common import glyph, G, cutline, side, mid_radii, far
@@ -73,37 +73,43 @@ def two(p):
     W = fbw(p)
     h2 = cap * 0.6 + 0.2 * p.dv
     ob = (W * 0.02, cap + os - h2, W, cap + os)
-    ib = (W * 0.02 + V * 0.95, cap + os - h2 + H * 1.05, W - V, cap + os - H)
+    ib = (W * 0.02 + V * 0.95, cap + os - h2 + H * 1.02, W - V, cap + os - H)
     r = ring(ob, ib, p.ko, p.ki)
     cx, cy, rx, ry = mid_radii(ob, ib)
-    a1 = -32
     r = D(r, I(leftof(cx), side(cutline(cx, cy, rx, ry, 162, TV), far(cx, cy, -1, -1))))
-    r = D(r, wedge(cx, cy, 180, 360 + a1))
-    ar = math.radians(a1)
-    px, py = cx + rx * math.cos(ar), cy + ry * math.sin(ar)
-    tx, ty = -rx * math.sin(ar) * -1, ry * math.cos(ar)  # tangent (clockwise)
-    tx, ty = rx * math.sin(ar), -ry * math.cos(ar)
-    L = math.hypot(tx, ty)
-    tx, ty = tx / L, ty / L
-    back = V * 0.35
-    dg = line(px - tx * back, py - ty * back, V * 0.45, H * 0.5, p.CD * 0.95)
-    dg = I(dg, rightof(0), above(0))
-    s = U(r, dg, rect(0, 0, W, H))
-    return tab(p, s)
+    # spine: two lines from the base, tangent to the outer / inner contour
+    wd = solve_w(p.CD * 0.98, W * 0.9, cy)
+    br = (wd, H * 0.5)
+    bl = (0, H * 0.5)
+    to = tangent_pt(ellipse_pts(*ob, k=p.ko), br, min, lambda q: q[0] > cx - rx * 0.2 and q[1] < cy + ry * 0.3)
+    ti = tangent_pt(ellipse_pts(*ib, k=p.ki), bl, min, lambda q: q[0] > cx - rx * 0.2 and q[1] < cy + ry * 0.3)
+    spine = poly([bl, br, to, ti])
+    # drop the part of the ring beyond the spine
+    r = D(r, I(below(cy), side((ti[0], ti[1], to[0], to[1]), (cx - rx, ob[1]))))
+    s = U(r, spine, rect(0, 0, W, H))
+    return tab(p, I(s, rightof(0)))
 
 
 @glyph("three", 0x33)
 def three(p):
     V, H, cap, os = fstem(p), fhor(p), p.cap, p.cos
     W = fbw(p)
-    ylt = cap * 0.6
-    bw, (cx, cy, rx, ry) = open_bowl(p, 0, W, ylt)
-    xt = W * 0.94
-    tb = rect(W * 0.04, cap - H, xt, cap)
-    wd = hwidth(p.CD * 0.94, xt - cx, cap - ylt)
-    dg = para(cx - wd * 0.3, cx + wd * 0.7, ylt - H, xt - wd, xt, cap)
-    dg = I(dg, band(ylt - H, cap))
-    return tab(p, U(bw, tb, dg))
+    ym = cap * 0.555
+    i = W * 0.07
+    obu = (i, ym - H / 2, W - i, cap + os)
+    ibu = (i + V * 0.95, ym + H / 2, W - i - V * 0.95, cap + os - H)
+    up = ring(obu, ibu, p.ko, p.ki)
+    cx, cyu, rx, ryu = mid_radii(obu, ibu)
+    up = D(up, I(leftof(cx), below(cyu)),
+           I(leftof(cx), side(cutline(cx, cyu, rx, ryu, 150, TV), far(cx, cyu, -1, -1))))
+    obl = (0, -os, W, ym + H / 2)
+    ibl = (V, -os + H, W - V, ym - H / 2)
+    lo = ring(obl, ibl, p.ko, p.ki)
+    cx2, cyl, rx2, ryl = mid_radii(obl, ibl)
+    lo = D(lo, I(leftof(cx2), above(cyl)),
+           I(leftof(cx2), side(cutline(cx2, cyl, rx2, ryl, 208, TV), far(cx2, cyl, -1, 1))))
+    waist = rect(cx - W * 0.17, ym - H / 2, cx + 1, ym + H / 2)
+    return tab(p, U(up, lo, waist))
 
 
 @glyph("four", 0x34)
@@ -142,32 +148,23 @@ def five(p):
 
 
 def _six(p):
+    """Grotesque 6: round bowl plus a curved stroke that rises up the left
+    side and ends in a flat terminal at the top right."""
     V, H, cap, os = fstem(p), fhor(p), p.cap, p.cos
     W = fbw(p)
-    ylt = cap * 0.62
+    ylt = cap * 0.6
     ob = (0, -os, W, ylt)
     ib = (V, -os + H, W - V, ylt - H)
-    r = ring(ob, ib, p.ko, p.ki)
-    cx, cy, rx, ry = mid_radii(ob, ib)
-    # straight stroke leaving the bowl tangentially towards the top right
-    target = W * 0.78
-    best = None
-    for a10 in range(1100, 1790, 5):
-        a = math.radians(a10 / 10)
-        px, py = cx + rx * math.cos(a), cy + ry * math.sin(a)
-        tx, ty = rx * math.sin(a), -ry * math.cos(a)
-        if ty <= 0:
-            continue
-        xt = px + (cap - py) * tx / ty
-        if best is None or abs(xt - target) < abs(best[0] - target):
-            best = (xt, px, py, tx, ty)
-    xt, px, py, tx, ty = best
-    L = math.hypot(tx, ty)
-    tx, ty = tx / L, ty / L
-    ext = (cap + 200 - py) / ty
-    dg = line(px - tx * V, py - ty * V, px + tx * ext, py + ty * ext, p.CD * 0.95)
-    dg = I(dg, below(cap), above(cy))
-    return U(r, dg)
+    bw = ring(ob, ib, p.ko, p.ki)
+    cyl = (ob[1] + ob[3]) / 2
+    cy2 = cap * 0.5
+    i2 = W * 0.01
+    ob2 = (0, 2 * cy2 - (cap + os), W - i2, cap + os)
+    ib2 = (V, 2 * cy2 - (cap + os) + H, W - i2 - V * 0.95, cap + os - H)
+    arc = I(ring(ob2, ib2, p.ko, p.ki), above(cy2))
+    cx2, _, rx2, ry2 = mid_radii(ob2, ib2)
+    arc = D(arc, I(rightof(cx2), side(cutline(cx2, cy2, rx2, ry2, 38, TV), far(cx2, cy2, 1, -1))))
+    return U(bw, arc, rect(0, cyl, V, cy2 + 1))
 
 
 @glyph("six", 0x36)

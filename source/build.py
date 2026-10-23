@@ -149,7 +149,7 @@ def make_font(p, flavor):
         "typographicFamily": FAMILY,
         "typographicSubfamily": style,
         "designer": "Formwerk Project",
-        "description": "Formwerk - a bold, modern geometric sans serif for posters, social ads and text.",
+        "description": "Formwerk - a bold industrial grotesque for posters, social ads and text.",
         "licenseDescription": "This Font Software is licensed under the SIL Open Font License, Version 1.1.",
         "licenseInfoURL": "https://openfontlicense.org",
     }

@@ -54,6 +54,34 @@ def ellipse(x0, y0, x1, y1, k=0.5523):
     return p
 
 
+def ellipse_pts(x0, y0, x1, y1, k=0.5523, n=96):
+    """Points along the outline produced by ellipse() (ccw from the right)."""
+    cx, cy = (x0 + x1) / 2.0, (y0 + y1) / 2.0
+    rx, ry = (x1 - x0) / 2.0, (y1 - y0) / 2.0
+    quads = [
+        ((x1, cy), (x1, cy + k * ry), (cx + k * rx, y1), (cx, y1)),
+        ((cx, y1), (cx - k * rx, y1), (x0, cy + k * ry), (x0, cy)),
+        ((x0, cy), (x0, cy - k * ry), (cx - k * rx, y0), (cx, y0)),
+        ((cx, y0), (cx + k * rx, y0), (x1, cy - k * ry), (x1, cy)),
+    ]
+    pts = []
+    for a, b, c, d in quads:
+        for i in range(n):
+            t = i / float(n)
+            mt = 1 - t
+            pts.append((mt ** 3 * a[0] + 3 * mt * mt * t * b[0] + 3 * mt * t * t * c[0] + t ** 3 * d[0],
+                        mt ** 3 * a[1] + 3 * mt * mt * t * b[1] + 3 * mt * t * t * c[1] + t ** 3 * d[1]))
+    return pts
+
+
+def tangent_pt(pts, origin, pick=min, where=None):
+    """Point of `pts` (a convex outline) touched by a line from `origin`:
+    pick=min gives the clockwise-most, max the counter-clockwise-most."""
+    ox, oy = origin
+    cand = [q for q in pts if where is None or where(q)]
+    return pick(cand, key=lambda q: math.atan2(q[1] - oy, q[0] - ox))
+
+
 def circle(cx, cy, r, k=0.5523):
     return ellipse(cx - r, cy - r, cx + r, cy + r, k)
 
@@ -150,13 +178,28 @@ def _norm(p):
     return q
 
 
+def _union(ps):
+    out = Path()
+    pathops.union(ps, out.getPen())
+    return out
+
+
 def U(*ps):
-    ps = [p for p in ps if p is not None]
+    ps = [p for p in ps if p is not None and len(list(p.contours))]
     if not ps:
         return Path()
-    out = Path()
-    pen = out.getPen()
-    pathops.union(ps, pen)
+    out = _union(ps)
+    # skia-pathops occasionally drops pieces when contours touch along a
+    # tangent; detect that from the bounding box and retry with a tiny nudge.
+    bs = [p.bounds for p in ps]
+    want = (min(b[0] for b in bs), min(b[1] for b in bs), max(b[2] for b in bs), max(b[3] for b in bs))
+    for attempt in range(1, 6):
+        got = bounds(out)
+        if all(abs(g - w) < 0.6 for g, w in zip(got, want)):
+            break
+        e = 0.013 * attempt
+        out = _union([xform(p, (1, 0, 0, 1, e * (i % 3 - 1), e * ((i + 1) % 3 - 1)))
+                      for i, p in enumerate(ps)])
     return out
 
 

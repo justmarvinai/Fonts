@@ -107,7 +107,7 @@ def exclam(p):
     V = p.CV * 1.02
     gap = d * 0.45 + 40
     cx = d / 2
-    stem = poly([(cx - V / 2, p.cap), (cx + V / 2, p.cap), (cx + V * 0.4, d + gap), (cx - V * 0.4, d + gap)])
+    stem = rect(cx - V / 2, d + gap, cx + V / 2, p.cap)
     return G(U(stem, dot(cx, d / 2, d)), p.sb, p.sb)
 
 
@@ -300,15 +300,15 @@ def underscore(p):
 
 
 def _paren(p):
-    V, H = p.CV * 0.95, p.CH * 0.9
+    """Crescent: an oval minus the same oval shifted right."""
+    V = p.CV * 0.92
     yb, yt = p.desc + 40, p.cap + 60
     hgt = yt - yb
-    W = p.w(150, 0.8)
-    R = hgt * 0.62
-    ob = (0, yb, 2 * R, yt)
-    ib = (V, yb + H, 2 * R - V, yt - H)
-    r = I(ring(ob, ib, p.ko - 0.03, p.ki - 0.03), leftof(W + V * 0.2))
-    return r
+    W = p.w(170, 0.6)
+    e = hgt * 0.06
+    o = ellipse(0, yb - e, W * 2.6, yt + e, 0.5523)
+    r = D(o, move(o, V, 0))
+    return I(r, band(yb, yt), leftof(W))
 
 
 @glyph("parenleft", 0x28)

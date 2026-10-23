@@ -1,6 +1,6 @@
 # Formwerk
 
-**Formwerk** is a bold, modern geometric sans serif made for posters, social ads and loud artwork, with an x-height and apertures that keep it readable in running text.
+**Formwerk** is a bold industrial grotesque in the spirit of Mona Sans, made for posters, social ads and loud artwork, with even strokes, a large x-height and wide capitals that keep it readable in running text.
 
 ![Formwerk specimen](specimen/preview.png)
 
@@ -9,17 +9,18 @@
 | Style   | Weight class | Stem (units) | Use |
 |---------|-------------:|-------------:|-----|
 | Regular | 400 | 86  | Body text, captions |
-| Medium  | 500 | 112 | UI, subheads, small text on images |
-| Bold    | 700 | 146 | Headlines |
-| Fat     | 900 | 184 | Posters, social ads, display |
+| Medium  | 500 | 113 | UI, subheads, small text on images |
+| Bold    | 700 | 148 | Headlines |
+| Fat     | 900 | 188 | Posters, social ads, display |
 
-## What makes it Formwerk
+## Design
 
-- **Geometric construction:** bowls are superellipses, a touch squarer than a true circle, which gives the solid, modern feel of fonts like Gilroy or Futura.
-- **Notched joints:** arches and bowls leave the stems through a thin, crisp notch (n, m, h, b, d, p, q, u, a). The heavy weights keep open counters, and the notches act like ink traps at small sizes.
-- **Angled terminals:** c, e, s, a, f, t, j, g, r end in slanted cuts, halfway between radial and vertical.
-- **Signature details:** a diagonally sliced `t`, a flat-topped `3`, a straight-tailed `Q`, round dots, and a geometric `ß` and capital `ẞ`.
-- **Display extras:** arrows `→ ← ↑ ↓ ↗ ↘`, solid-head arrows for ads, and tabular figures that line up in prices and dates.
+- **Even strokes:** horizontals are 0.87× the stems in Regular and 0.80× in Fat, close to Mona Sans. There is just enough optical correction that bars look as heavy as stems.
+- **Flush shoulders:** arches and bowls leave the stem flush with a high crotch. There are no spurs or deep notches at the joints.
+- **Flat terminals:** c, e, s, a, C, G, S, 2, 3, 5, 6, 9 end in horizontal cuts. The t, f, j and r hooks use a short angled cut.
+- **Softly squared rounds:** the bowls are superellipses, rounder than a box and squarer than a circle.
+- **Grotesque details:** a double-storey `a` with a flat-topped bowl, a single-storey `g`, a `G` with a spur, a short crossing `Q` tail, curved `3` `6` `9`, square dots, and a round `ß` with a matching capital `ẞ`.
+- **Display extras:** arrows `→ ← ↑ ↓ ↗ ↘` and tabular figures that line up in prices and dates.
 
 ## Character set (281 characters per weight)
 
@@ -34,7 +35,7 @@
 ## OpenType features
 
 - `kern`: automatic class kerning (AV, To, LT, T., “A and so on)
-- `ss01` / `salt`: single-storey geometric `a`, including all accented forms
+- `ss01` / `salt`: single-storey `a`, including all accented forms
 
 ```css
 .poster { font-family: "Formwerk"; font-weight: 900; font-feature-settings: "ss01" 1; }
@@ -63,7 +64,7 @@ To install on desktop, open the `.otf` files (macOS: Font Book, Windows: right-c
 
 ## Metrics
 
-UPM 1000 · cap height 700 · x-height 520 · ascender 745 · descender −215
+UPM 1000 · cap height 720 · x-height 526 (Regular) to 544 (Fat) · ascender 752 · descender −212
 
 ## Building from source
 
@@ -85,6 +86,7 @@ python3 source/sheet.py proof.png 120 "Hamburgefonstiv"   # quick multi-weight p
 | `source/accents.py` | diacritics and accented letters |
 | `source/features.py` | kerning (from outline profiles) and `ss01` |
 | `source/build.py` | font compilation (OTF, TTF, WOFF2, WOFF) |
+| `source/sheet.py`, `compare.py`, `kerncheck.py` | proof images and kerning spot checks |
 
 ## License
 
