@@ -1,0 +1,7 @@
+fonttools[woff]>=4.50
+skia-pathops>=0.8
+ttfautohint-py>=0.5
+# proofing only
+uharfbuzz
+freetype-py
+Pillow

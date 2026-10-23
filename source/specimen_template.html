@@ -1,0 +1,259 @@
+<title>Formwerk Specimen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a poster wall. Full-bleed colour bands, giant type, a working tester, then the full character set. */
+@font-face { font-family: "Formwerk"; font-weight: 400; src: url("{{Regular}}") format("woff2"); font-display: swap; }
+@font-face { font-family: "Formwerk"; font-weight: 500; src: url("{{Medium}}") format("woff2"); font-display: swap; }
+@font-face { font-family: "Formwerk"; font-weight: 700; src: url("{{Bold}}") format("woff2"); font-display: swap; }
+@font-face { font-family: "Formwerk"; font-weight: 900; src: url("{{Fat}}") format("woff2"); font-display: swap; }
+
+:root {
+  --paper: #eceef1;
+  --ink: #101217;
+  --muted: #5b606c;
+  --line: #c9ccd3;
+  --cobalt: #2433ff;
+  --sun: #ffcf2e;
+  --on-cobalt: #ffffff;
+  --on-sun: #101217;
+  --display: "Formwerk", "Avenir Next", "Futura", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f1115; --ink: #eceef2; --muted: #9aa0ad; --line: #2a2e37;
+    --cobalt: #5563ff; --sun: #ffd23f; --on-cobalt: #ffffff; --on-sun: #101217;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f1115; --ink: #eceef2; --muted: #9aa0ad; --line: #2a2e37;
+  --cobalt: #5563ff; --sun: #ffd23f; --on-cobalt: #ffffff; --on-sun: #101217;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--display); font-weight: 400; font-size: 17px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.band { padding-block: clamp(40px, 7vw, 88px); }
+.label { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+h2 { font-weight: 900; font-size: clamp(30px, 5vw, 56px); line-height: 1; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+
+/* hero */
+.hero { padding-block: clamp(28px, 5vw, 56px) clamp(32px, 6vw, 72px); }
+.hero-top { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.hero h1 { font-weight: 900; font-size: clamp(52px, 13.5vw, 188px); line-height: 0.9; letter-spacing: -0.025em; margin: 0.22em 0 0.16em; white-space: nowrap; }
+.hero h1 span { color: var(--cobalt); }
+.hero-sub { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; align-items: end; }
+.hero-sub p { margin: 0; font-size: clamp(18px, 2vw, 22px); line-height: 1.4; max-width: 34ch; }
+.weights-mini { display: flex; gap: 18px; flex-wrap: wrap; font-size: clamp(22px, 3vw, 32px); }
+
+/* weights */
+.weights { border-top: 2px solid var(--ink); }
+.wrow { display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: baseline; padding-block: 18px; border-bottom: 1px solid var(--line); }
+.wrow .w-sample { font-size: clamp(34px, 7vw, 92px); line-height: 1; letter-spacing: -0.01em; overflow-wrap: anywhere; min-width: 0; }
+.wrow .w-meta { display: flex; flex-direction: column; gap: 4px; }
+.wrow .w-name { font-weight: 700; font-size: 18px; }
+
+/* posters */
+.posters { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 28px; }
+.poster { aspect-ratio: 4 / 5; max-width: 100%; padding: clamp(18px, 2.4vw, 28px); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+.poster .tag { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+.p1 { background: var(--cobalt); color: var(--on-cobalt); }
+.p2 { background: var(--sun); color: var(--on-sun); }
+.p3 { background: var(--ink); color: var(--paper); }
+.p1 .big { font-weight: 900; font-size: clamp(64px, 9vw, 120px); line-height: 0.85; letter-spacing: -0.03em; }
+.p2 .big { font-weight: 900; font-size: clamp(40px, 5.2vw, 68px); line-height: 0.92; letter-spacing: -0.02em; }
+.p3 .big { font-weight: 700; font-size: clamp(40px, 5vw, 64px); line-height: 0.95; letter-spacing: -0.015em; }
+.poster .foot { display: flex; justify-content: space-between; align-items: end; gap: 12px; font-weight: 500; font-size: 18px; }
+.poster .arrow { font-weight: 900; font-size: 44px; line-height: 1; }
+
+/* tester */
+.tester-controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin: 24px 0 8px; }
+.seg { display: inline-flex; border: 2px solid var(--ink); }
+.seg button { font: inherit; font-weight: 700; font-size: 15px; padding: 8px 14px; background: transparent; color: var(--ink); border: 0; cursor: pointer; }
+.seg button + button { border-left: 2px solid var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.seg button:focus-visible, .toggle input:focus-visible + span, #size:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 2px; }
+.ctl { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+#size { accent-color: var(--cobalt); width: 160px; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 13px; color: var(--muted); cursor: pointer; }
+.toggle input { accent-color: var(--cobalt); width: 18px; height: 18px; }
+#tester { font-size: 96px; font-weight: 900; line-height: 1.02; letter-spacing: -0.015em; padding-block: 18px 22px; border-block: 2px solid var(--ink); outline: none; overflow-wrap: anywhere; min-height: 1.4em; }
+#tester:focus-visible { border-color: var(--cobalt); }
+
+/* text */
+.text-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(24px, 4vw, 56px); margin-top: 28px; }
+.text-grid > div { min-width: 0; }
+.text-grid h3 { font-weight: 700; font-size: 26px; line-height: 1.15; margin: 0 0 12px; text-wrap: balance; }
+.text-grid p { margin: 0 0 1em; max-width: 62ch; }
+.text-grid .size { margin-bottom: 10px; }
+
+/* glyphs */
+.glyphs { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin-top: 28px; }
+.glyphs span { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 34px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); cursor: default; transition: background-color .12s, color .12s; }
+.glyphs span:hover { background: var(--cobalt); color: var(--on-cobalt); }
+.glyph-tabs { margin-top: 20px; }
+
+/* specs */
+.specs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0; border-top: 2px solid var(--ink); margin-top: 28px; }
+.spec { padding: 18px 16px 18px 0; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.spec b { font-weight: 900; font-size: 30px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.section-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; }
+footer { padding-block: 32px 48px; border-top: 2px solid var(--ink); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.ss01 { font-feature-settings: "ss01" 1; }
+@media (max-width: 560px) {
+  .wrow { grid-template-columns: 1fr; gap: 6px; }
+  #tester { font-size: 56px; }
+}
+@media (prefers-reduced-motion: reduce) { .glyphs span { transition: none; } }
+</style>
+
+<header class="wrap hero">
+  <div class="hero-top">
+    <span class="label">Typeface specimen · v1.000</span>
+    <span class="label">4 weights · {{GLYPHS}} glyphs · Latin</span>
+  </div>
+  <h1>Form<span>werk</span></h1>
+  <div class="hero-sub">
+    <p>A bold geometric sans for posters, social ads and loud artwork, built to hold up in long text too.</p>
+    <div class="weights-mini" aria-label="Weights">
+      <span style="font-weight:400">Regular</span>
+      <span style="font-weight:500">Medium</span>
+      <span style="font-weight:700">Bold</span>
+      <span style="font-weight:900">Fat</span>
+    </div>
+  </div>
+</header>
+
+<section class="wrap band" aria-labelledby="w-h">
+  <div class="section-head"><h2 id="w-h">Four weights</h2><span class="label">Stem width in font units</span></div>
+  <div class="weights" style="margin-top:28px">
+    <div class="wrow"><div class="w-meta"><span class="w-name">Regular</span><span class="label">400 · stem 86</span></div><div class="w-sample" style="font-weight:400">Straße der Formen</div></div>
+    <div class="wrow"><div class="w-meta"><span class="w-name">Medium</span><span class="label">500 · stem 112</span></div><div class="w-sample" style="font-weight:500">Bold Moves Only</div></div>
+    <div class="wrow"><div class="w-meta"><span class="w-name">Bold</span><span class="label">700 · stem 146</span></div><div class="w-sample" style="font-weight:700">Grüße aus Köln</div></div>
+    <div class="wrow"><div class="w-meta"><span class="w-name">Fat</span><span class="label">900 · stem 184</span></div><div class="w-sample" style="font-weight:900">MEGA DROP →</div></div>
+  </div>
+</section>
+
+<section class="wrap band" aria-labelledby="p-h">
+  <div class="section-head"><h2 id="p-h">On the wall</h2><span class="label">Social ad formats, 4:5</span></div>
+  <div class="posters">
+    <div class="poster p1">
+      <span class="tag">Sommer Sale · 48h</span>
+      <div class="big">−50%<br>auf alles</div>
+      <div class="foot"><span>Nur online.</span><span class="arrow">↗</span></div>
+    </div>
+    <div class="poster p2">
+      <span class="tag">Festival 2026</span>
+      <div class="big">LAUT.<br>GRÖẞER.<br>JETZT.</div>
+      <div class="foot"><span>12.–14. Juni · Hamburg</span><span class="arrow">→</span></div>
+    </div>
+    <div class="poster p3">
+      <span class="tag">New Drop</span>
+      <div class="big">Made for the scroll-stopping moment.</div>
+      <div class="foot"><span>Formwerk Bold</span><span class="arrow">↓</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap band" aria-labelledby="t-h">
+  <div class="section-head"><h2 id="t-h">Try it</h2><span class="label">Click the line and type</span></div>
+  <div class="tester-controls">
+    <div class="seg" role="group" aria-label="Weight">
+      <button type="button" id="w400" data-w="400" aria-pressed="false">Regular</button>
+      <button type="button" id="w500" data-w="500" aria-pressed="false">Medium</button>
+      <button type="button" id="w700" data-w="700" aria-pressed="false">Bold</button>
+      <button type="button" id="w900" data-w="900" aria-pressed="true">Fat</button>
+    </div>
+    <label class="ctl" for="size">Size <input type="range" id="size" min="24" max="220" value="96"> <output id="size-out">96 px</output></label>
+    <label class="toggle"><input type="checkbox" id="ss01"><span>ss01 · single-storey a</span></label>
+  </div>
+  <div id="tester" contenteditable="true" spellcheck="false" role="textbox" aria-label="Type tester">Quality Design &amp; Bold Ads</div>
+</section>
+
+<section class="wrap band" aria-labelledby="x-h">
+  <div class="section-head"><h2 id="x-h">In running text</h2><span class="label">Regular 17/26 · Medium 15/23</span></div>
+  <div class="text-grid">
+    <div>
+      <div class="label size">Deutsch</div>
+      <h3>Geometrie mit Haltung</h3>
+      <p>Formwerk ist aus Kreisen, Geraden und klaren Schnitten gebaut. Die Rundungen sind eine Spur quadratischer als ein reiner Kreis, die Anschlüsse an den Stämmen sind schmal eingeschnitten. Dadurch bleiben die Innenräume auch im Fat-Schnitt offen.</p>
+      <p>Umlaute, das ß und das große ẞ sitzen ruhig in der Zeile: Übergrößenmaße, Ölgemälde, Fußgängerzone.</p>
+    </div>
+    <div>
+      <div class="label size">English</div>
+      <h3>Built from circles and straight cuts</h3>
+      <p>The bowls are slightly squarer than a true circle, terminals are cut at an angle, and every joint is notched thin so heavy weights keep their counters. At text sizes the generous x-height and open apertures keep paragraphs easy to read.</p>
+      <p style="font-weight:500; font-size:15px; line-height:1.55">Medium at 15 px: 0123456789 · €19,90 · 50% off · “quotes” · ‹guillemets› · Æsir, Œuvre, Øresund, Łódź, Škoda, İstanbul.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap band" aria-labelledby="g-h">
+  <div class="section-head"><h2 id="g-h">Character set</h2><span class="label">Hover a glyph</span></div>
+  <div class="tester-controls glyph-tabs">
+    <div class="seg" role="group" aria-label="Glyph weight">
+      <button type="button" id="g400" data-gw="400" aria-pressed="false">Regular</button>
+      <button type="button" id="g500" data-gw="500" aria-pressed="false">Medium</button>
+      <button type="button" id="g700" data-gw="700" aria-pressed="true">Bold</button>
+      <button type="button" id="g900" data-gw="900" aria-pressed="false">Fat</button>
+    </div>
+  </div>
+  <div class="glyphs" id="glyphs" style="font-weight:700">{{GLYPHSPANS}}</div>
+</section>
+
+<section class="wrap band" aria-labelledby="s-h">
+  <div class="section-head"><h2 id="s-h">Specs</h2><span class="label">UPM 1000</span></div>
+  <div class="specs">
+    <div class="spec"><span class="label">Cap height</span><b>700</b></div>
+    <div class="spec"><span class="label">x-height</span><b>520</b></div>
+    <div class="spec"><span class="label">Ascender / descender</span><b>745 / −215</b></div>
+    <div class="spec"><span class="label">Glyphs per weight</span><b>{{GLYPHS}}</b></div>
+    <div class="spec"><span class="label">Features</span><b>kern · ss01</b></div>
+    <div class="spec"><span class="label">Formats</span><b>OTF · TTF · WOFF2</b></div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <span class="label">Formwerk · SIL Open Font License 1.1</span>
+  <span class="label">Regular · Medium · Bold · Fat</span>
+</footer>
+
+<script>
+(function () {
+  var tester = document.getElementById("tester");
+  var size = document.getElementById("size");
+  var out = document.getElementById("size-out");
+  var ss = document.getElementById("ss01");
+  function pressGroup(attr, value) {
+    document.querySelectorAll("[" + attr + "]").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute(attr) === value ? "true" : "false");
+    });
+  }
+  document.querySelectorAll("[data-w]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      tester.style.fontWeight = b.dataset.w;
+      pressGroup("data-w", b.dataset.w);
+    });
+  });
+  document.querySelectorAll("[data-gw]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.getElementById("glyphs").style.fontWeight = b.dataset.gw;
+      pressGroup("data-gw", b.dataset.gw);
+    });
+  });
+  function setSize() {
+    tester.style.fontSize = size.value + "px";
+    out.textContent = size.value + " px";
+  }
+  size.addEventListener("input", setSize);
+  if (window.matchMedia("(max-width: 560px)").matches) { size.value = 56; }
+  setSize();
+  ss.addEventListener("change", function () {
+    tester.classList.toggle("ss01", ss.checked);
+  });
+})();
+</script>
